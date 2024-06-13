@@ -3,6 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/user.routes');
+const postRoutes = require('./routes/post.routes');
+const uploadRoute = require('./routes/upload');
 require('dotenv').config({path: './config/.env'}); //recuperer les parametres environnement
 require('./config/db');
 const {checkUser, requireAuth} = require('./middleware/auth.middleware');
@@ -12,6 +14,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({encoded: true}));
 app.use(cookieParser());
 
+// Middleware pour parser le body des requêtes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Intégrer la route de l'upload
+app.use('/api/user', uploadRoute);
+
 //jwt
 app.get('*', checkUser);
 app.get('/jwtid', requireAuth, (req, res) => {
@@ -20,6 +29,7 @@ app.get('/jwtid', requireAuth, (req, res) => {
 
 //routes
 app.use('/api/user', userRoutes);
+app.use('/api/post', postRoutes)
 
 
 // ecouter le port 5000

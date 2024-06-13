@@ -1,6 +1,6 @@
 const UserModel = require('../models/user.model')
 const jwt = require('jsonwebtoken') //assigner la bibliotheque json
-const {signUpErrors} = require('../utils/errors.utils');
+const {signUpErrors, signInErrors} = require('../utils/errors.utils');
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 const createToken = (id) => {
@@ -26,15 +26,17 @@ module.exports.signUp = async (req, res) => {
 
 module.exports.signIn = async (req, res) => {
     const {email, password} = req.body //destructuring
-
     try{
         const user = await UserModel.login(email, password);
         const token = createToken(user._id);
         res.cookie('jwt', token, {httpOnly: true, maxAge});
         res.status(200).json({user: user._id})
     } catch (err){
-        console.log(err)
-        res.status(200).json(err)
+        /*
+        const errors = signInErrors(err);
+        res.status(404).json({ errors });
+        */
+        res.status(404).send(err.message);
     }
 }
 
